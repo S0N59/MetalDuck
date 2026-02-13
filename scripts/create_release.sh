@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SDKROOT_PATH="${SDKROOT:-/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk}"
+CODESIGN_IDENTITY="${CODESIGN_IDENTITY:--}"
 
 cd "$ROOT_DIR"
 
@@ -77,6 +78,10 @@ PLIST
 
 touch "$CONTENTS_DIR/PkgInfo"
 echo "APPL????" > "$CONTENTS_DIR/PkgInfo"
+
+# Re-sign the full app bundle after assembling it, so Gatekeeper sees a valid signature.
+codesign --force --deep --sign "$CODESIGN_IDENTITY" "$APP_DIR"
+codesign --verify --deep --strict --verbose=2 "$APP_DIR"
 
 cp -R "$APP_DIR" "$DMG_STAGE_DIR/"
 ln -s /Applications "$DMG_STAGE_DIR/Applications"

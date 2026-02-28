@@ -83,15 +83,59 @@ echo "APPL????" > "$CONTENTS_DIR/PkgInfo"
 codesign --force --deep --sign "$CODESIGN_IDENTITY" "$APP_DIR"
 codesign --verify --deep --strict --verbose=2 "$APP_DIR"
 
+# Assemble the DMG stage directory
 cp -R "$APP_DIR" "$DMG_STAGE_DIR/"
 ln -s /Applications "$DMG_STAGE_DIR/Applications"
 
-rm -f "$DMG_PATH"
-hdiutil create \
-  -volname "MetalDuck" \
-  -srcfolder "$DMG_STAGE_DIR" \
-  -ov \
-  -format UDZO \
-  "$DMG_PATH" >/dev/null
+# Set up the DMG background
+mkdir -p "$DMG_STAGE_DIR/.background"
+if [[ -f "$ROOT_DIR/Sources/MetalDuck/Assets/dmg_background.png" ]]; then
+  cp "$ROOT_DIR/Sources/MetalDuck/Assets/dmg_background.png" "$DMG_STAGE_DIR/.background/background.png"
+fi
+
+# Create a temporary empty DMG to configure layout
+TEMP_DMG="${DMG_PATH}.temp.dmg"
+rm -f "$TEMP_DMG" "$DMG_PATH"
+
+hdiutil create -srcfolder "$DMG_STAGE_DIR" -volname "MetalDuck" -format UDRW -ov "$TEMP_DMG"
+
+# Mount the temporary DMG
+echo "Mounting temporary DMG to configure layout..."
+MOUNT_DIR=$(mktemp -d /tmp/metaldduck_mount.XXXXXX)
+hdiutil attach "$TEMP_DMG" -mountpoint "$MOUNT_DIR" -noautoopen
+
+# Use AppleScript to configure the DMG window
+echo "Configuring DMG layout via AppleScript..."
+VOLUME_NAME=$(basename "$MOUNT_DIR")
+osascript <<APPLESCRIPT
+tell application "Finder"
+    tell disk "$VOLUME_NAME"
+        open
+        set current view of container window to icon view
+        set toolbar visible of container window to false
+        set statusbar visible of container window to false
+        set the bounds of container window to {400, 100, 1000, 500}
+        set viewOptions to the icon view options of container window
+        set icon size of viewOptions to 100
+        set arrangement of viewOptions to not arranged
+        set background picture of viewOptions to file ".background:background.png"
+        set position of item "MetalDuck.app" of container window to {170, 200}
+        set position of item "Applications" of container window to {430, 200}
+        close
+    end tell
+end tell
+APPLESCRIPT
+
+# Give Finder a moment to write its .DS_Store
+sleep 2
+
+# Set the DMG root to be invisible (optional, but cleaner)
+# Set custom icon for the volume if needed
+
+# Detach and convert to compressed DMG
+hdiutil detach "$MOUNT_DIR"
+hdiutil convert "$TEMP_DMG" -format UDZO -o "$DMG_PATH"
+rm -f "$TEMP_DMG"
+rmdir "$MOUNT_DIR"
 
 echo "Release package created: $DMG_PATH"

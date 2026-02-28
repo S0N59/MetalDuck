@@ -59,9 +59,9 @@ cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
   <key>CFBundleIdentifier</key>
   <string>com.nycolazs.metaldduck</string>
   <key>CFBundleVersion</key>
-  <string>0.1.1</string>
+  <string>1.0.0</string>
   <key>CFBundleShortVersionString</key>
-  <string>0.1.1</string>
+  <string>1.0.0</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleExecutable</key>

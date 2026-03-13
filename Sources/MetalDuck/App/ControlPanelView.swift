@@ -1025,7 +1025,8 @@ final class ControlPanelView: NSView {
         profileListStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
         for profile in profiles {
-            let btn = ProfileButton(profile: profile, isActive: profile.id == activeId)
+            let isActive = (profile.id == activeId)
+            let btn = ProfileButton(profile: profile, isActive: isActive)
             btn.target = self
             btn.action = #selector(handleProfileSelected(_:))
             profileListStack.addArrangedSubview(btn)

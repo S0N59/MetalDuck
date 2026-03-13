@@ -193,7 +193,7 @@ final class CompactDropdown: NSView {
     }
 
     private func openPanel() {
-        guard let window = self.window else { return }
+        guard let window = self.window, let _ = window.screen else { return }
 
         // Build content view
         let contentView = NSView()

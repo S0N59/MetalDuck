@@ -67,6 +67,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Task { await viewController.start() }
             requestScreenCapturePermissionIfNeededAsync()
         } catch {
+            print("CRITICAL: Bootstrap failed: \(error)")
             presentFatalInitializationError(error)
         }
     }

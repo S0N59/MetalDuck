@@ -33,7 +33,7 @@ APP_DIR="$STAGE_DIR/$APP_BUNDLE_NAME"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
-DMG_PATH="$ROOT_DIR/dist/MetalDuck-macos-arm64.dmg"
+DMG_PATH="$ROOT_DIR/dist/MetalDuck-v1.1.0.dmg"
 
 rm -rf "$STAGE_DIR" "$DMG_STAGE_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR" "$DMG_STAGE_DIR"
@@ -59,9 +59,9 @@ cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
   <key>CFBundleIdentifier</key>
   <string>com.nycolazs.metaldduck</string>
   <key>CFBundleVersion</key>
-  <string>1.0.0</string>
+  <string>1.1.0</string>
   <key>CFBundleShortVersionString</key>
-  <string>1.0.0</string>
+  <string>1.1.0</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleExecutable</key>

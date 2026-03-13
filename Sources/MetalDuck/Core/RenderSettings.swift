@@ -30,6 +30,32 @@ struct RenderSettings: Codable, Equatable {
     var targetPresentationFPS: Int
     var frameGenerationEnabled: Bool
     var frameGenerationMode: FrameGenerationMode
+
+    init(
+        upscalingAlgorithm: UpscalingAlgorithm = .nativeLinear,
+        outputScale: Float = 1.0,
+        matchOutputResolution: Bool = true,
+        samplingMode: SamplingMode = .nearest,
+        sharpness: Float = 0.0,
+        dynamicResolutionEnabled: Bool = false,
+        dynamicScaleMinimum: Float = 0.5,
+        dynamicScaleMaximum: Float = 1.0,
+        targetPresentationFPS: Int = 60,
+        frameGenerationEnabled: Bool = false,
+        frameGenerationMode: FrameGenerationMode = .x2
+    ) {
+        self.upscalingAlgorithm = upscalingAlgorithm
+        self.outputScale = outputScale
+        self.matchOutputResolution = matchOutputResolution
+        self.samplingMode = samplingMode
+        self.sharpness = sharpness
+        self.dynamicResolutionEnabled = dynamicResolutionEnabled
+        self.dynamicScaleMinimum = dynamicScaleMinimum
+        self.dynamicScaleMaximum = dynamicScaleMaximum
+        self.targetPresentationFPS = targetPresentationFPS
+        self.frameGenerationEnabled = frameGenerationEnabled
+        self.frameGenerationMode = frameGenerationMode
+    }
 }
 
 struct ShortcutSettings: Codable, Equatable {

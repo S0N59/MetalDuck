@@ -131,12 +131,13 @@ enum MetalDuckIcon {
     }
 
     private static func loadBundledIcon(size: CGFloat) -> NSImage? {
-        guard let iconURL = Bundle.module.url(
-            forResource: "AppIcon",
-            withExtension: "png",
-            subdirectory: "Assets"
-        ),
-        let image = NSImage(contentsOf: iconURL) else {
+        guard let bundle = Bundle.safeModule,
+              let iconURL = bundle.url(
+                  forResource: "AppIcon",
+                  withExtension: "png",
+                  subdirectory: "Assets"
+              ),
+              let image = NSImage(contentsOf: iconURL) else {
             return nil
         }
 

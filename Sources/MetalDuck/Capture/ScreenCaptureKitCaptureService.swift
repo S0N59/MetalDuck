@@ -177,7 +177,19 @@ final class ScreenCaptureKitCaptureService: NSObject, FrameCaptureService, @unch
             return filter
 
         case .window(let window):
-            return SCContentFilter(desktopIndependentWindow: window)
+            if #available(macOS 13.0, *) {
+                return SCContentFilter(desktopIndependentWindow: window)
+            } else {
+                // macOS 12.3: desktopIndependentWindow is not available.
+                // Fallback to display-based filter.
+                if let display = shareableContent.displays.first {
+                    return SCContentFilter(display: display, excludingWindows: [])
+                } else {
+                    // This should theoretically not happen if ScreenCaptureKit is working,
+                    // but we must return something.
+                    fatalError("No shareable displays found during filter creation on macOS 12")
+                }
+            }
         }
     }
 

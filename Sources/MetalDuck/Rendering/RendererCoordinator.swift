@@ -286,14 +286,16 @@ final class RendererCoordinator: NSObject {
             ("Present", nil)
         ]
 
-        for location in resourceLocations {
-            if let url = Bundle.module.url(
-                forResource: location.name,
-                withExtension: "metal",
-                subdirectory: location.subdirectory
-            ),
-               let source = try? String(contentsOf: url, encoding: .utf8) {
-                return source
+        if let bundle = Bundle.safeModule {
+            for location in resourceLocations {
+                if let url = bundle.url(
+                    forResource: location.name,
+                    withExtension: "metal",
+                    subdirectory: location.subdirectory
+                ),
+                   let source = try? String(contentsOf: url, encoding: .utf8) {
+                    return source
+                }
             }
         }
 

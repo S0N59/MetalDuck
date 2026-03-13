@@ -11,7 +11,21 @@ final class ProfileManager {
     private(set) var activeProfileId: UUID
     
     var activeProfile: Profile {
-        profiles.first(where: { $0.id == activeProfileId }) ?? profiles[1] // Default to Balanced if active not found
+        if let found = profiles.first(where: { $0.id == activeProfileId }) {
+            return found
+        }
+        if profiles.count > 1 {
+            return profiles[1]
+        }
+        if let first = profiles.first {
+            return first
+        }
+        // Absolute safety fallback
+        return Profile(
+            name: "Default",
+            settings: RenderSettings(),
+            capture: CaptureConfiguration()
+        )
     }
     
     private init() {

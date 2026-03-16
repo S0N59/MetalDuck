@@ -33,8 +33,9 @@ APP_DIR="$STAGE_DIR/$APP_BUNDLE_NAME"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
-DMG_PATH="$ROOT_DIR/dist/MetalDuck-v1.2.0.dmg"
+DMG_PATH="$ROOT_DIR/dist/MetalDuck-1.2.0.dmg"
 
+rm -rf "$ROOT_DIR/dist/"*
 rm -rf "$STAGE_DIR" "$DMG_STAGE_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR" "$DMG_STAGE_DIR"
 
@@ -124,13 +125,14 @@ tell application "Finder"
         set the bounds to {400, 100, 1000, 500}
     end tell
     
-    set viewOptions to the icon view options of theWindow
-    set icon size of viewOptions to 128
-    set arrangement of viewOptions to not arranged
-    set background picture of viewOptions to file ".background:background.png" of (POSIX file "$MOUNT_DIR" as alias)
+    tell the icon view options of theWindow
+        set icon size to 128
+        set arrangement to not arranged
+        set background picture to file ".background:background.png" of (POSIX file "$MOUNT_DIR" as alias)
+    end tell
     
-    set position of item "MetalDuck.app" of theWindow to {140, 200}
-    set position of item "Applications" of theWindow to {460, 200}
+    set position of item "MetalDuck.app" of theWindow to {160, 180}
+    set position of item "Applications" of theWindow to {420, 180}
     
     close theWindow
 end tell

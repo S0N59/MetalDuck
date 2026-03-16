@@ -44,7 +44,10 @@ if [[ -d "$BUNDLE_DIR" ]]; then
   cp -R "$BUNDLE_DIR" "$RESOURCES_DIR/"
 fi
 if [[ -f "$ICON_FILE" ]]; then
+  echo "Found icon at $ICON_FILE, copying to $RESOURCES_DIR/AppIcon.icns"
   cp "$ICON_FILE" "$RESOURCES_DIR/AppIcon.icns"
+else
+  echo "ICON NOT FOUND AT $ICON_FILE" >&2
 fi
 
 cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
@@ -126,8 +129,8 @@ tell application "Finder"
     set arrangement of viewOptions to not arranged
     set background picture of viewOptions to file ".background:background.png" of (POSIX file "$MOUNT_DIR" as alias)
     
-    set position of item "MetalDuck.app" of theWindow to {170, 200}
-    set position of item "Applications" of theWindow to {430, 200}
+    set position of item "MetalDuck.app" of theWindow to {150, 230}
+    set position of item "Applications" of theWindow to {450, 230}
     
     close theWindow
 end tell

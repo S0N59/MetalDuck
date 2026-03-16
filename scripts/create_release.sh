@@ -125,12 +125,12 @@ tell application "Finder"
     end tell
     
     set viewOptions to the icon view options of theWindow
-    set icon size of viewOptions to 100
+    set icon size of viewOptions to 128
     set arrangement of viewOptions to not arranged
     set background picture of viewOptions to file ".background:background.png" of (POSIX file "$MOUNT_DIR" as alias)
     
-    set position of item "MetalDuck.app" of theWindow to {170, 190}
-    set position of item "Applications" of theWindow to {490, 190}
+    set position of item "MetalDuck.app" of theWindow to {140, 200}
+    set position of item "Applications" of theWindow to {460, 200}
     
     close theWindow
 end tell

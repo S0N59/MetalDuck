@@ -129,8 +129,8 @@ tell application "Finder"
     set arrangement of viewOptions to not arranged
     set background picture of viewOptions to file ".background:background.png" of (POSIX file "$MOUNT_DIR" as alias)
     
-    set position of item "MetalDuck.app" of theWindow to {150, 230}
-    set position of item "Applications" of theWindow to {450, 230}
+    set position of item "MetalDuck.app" of theWindow to {170, 190}
+    set position of item "Applications" of theWindow to {490, 190}
     
     close theWindow
 end tell

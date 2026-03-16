@@ -16,6 +16,7 @@ enum SamplingMode: String, Codable, Equatable, CaseIterable {
 enum FrameGenerationMode: String, Codable, Equatable, CaseIterable {
     case x2 = "2x (30 -> 60)"
     case x3 = "3x (30 -> 90)"
+    case x4 = "4x (30 -> 120)"
 }
 
 struct RenderSettings: Codable, Equatable {
@@ -32,17 +33,17 @@ struct RenderSettings: Codable, Equatable {
     var frameGenerationMode: FrameGenerationMode
 
     init(
-        upscalingAlgorithm: UpscalingAlgorithm = .nativeLinear,
+        upscalingAlgorithm: UpscalingAlgorithm = .metalFXSpatial,
         outputScale: Float = 1.0,
         matchOutputResolution: Bool = true,
-        samplingMode: SamplingMode = .nearest,
-        sharpness: Float = 0.0,
+        samplingMode: SamplingMode = .linear,
+        sharpness: Float = 0.75,
         dynamicResolutionEnabled: Bool = false,
         dynamicScaleMinimum: Float = 0.5,
         dynamicScaleMaximum: Float = 1.0,
-        targetPresentationFPS: Int = 60,
-        frameGenerationEnabled: Bool = false,
-        frameGenerationMode: FrameGenerationMode = .x2
+        targetPresentationFPS: Int = 120,
+        frameGenerationEnabled: Bool = true,
+        frameGenerationMode: FrameGenerationMode = .x4
     ) {
         self.upscalingAlgorithm = upscalingAlgorithm
         self.outputScale = outputScale
@@ -124,13 +125,13 @@ final class SettingsStore {
         outputScale: 1.0,
         matchOutputResolution: true,
         samplingMode: .linear,
-        sharpness: 0.0,
+        sharpness: 0.75,
         dynamicResolutionEnabled: false,
         dynamicScaleMinimum: 0.75,
         dynamicScaleMaximum: 1.0,
-        targetPresentationFPS: 60,
+        targetPresentationFPS: 120,
         frameGenerationEnabled: true,
-        frameGenerationMode: .x2
+        frameGenerationMode: .x4
     )
 
     private var shortcutSettings: ShortcutSettings = {

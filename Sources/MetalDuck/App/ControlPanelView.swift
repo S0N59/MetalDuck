@@ -745,7 +745,6 @@ final class ControlPanelView: NSView {
         targetFPSSlider.target = self
         targetFPSSlider.action = #selector(handleTargetFPSChanged)
 
-        frameGenerationSwitch.target = self
         frameGenerationSwitch.action = #selector(handleFrameGenerationEnabledChanged)
 
         addProfileButton.target = self
@@ -1157,7 +1156,7 @@ final class ControlPanelView: NSView {
         card.contentStack.addArrangedSubview(statusContainer)
         card.contentStack.addArrangedSubview(statsLabel)
 
-        // Stretch both to fill card width
+        // Stretch items to fill card width
         statusContainer.leadingAnchor.constraint(equalTo: card.contentStack.leadingAnchor).isActive = true
         statusContainer.trailingAnchor.constraint(equalTo: card.contentStack.trailingAnchor).isActive = true
         statsLabel.leadingAnchor.constraint(equalTo: card.contentStack.leadingAnchor).isActive = true
@@ -1514,8 +1513,6 @@ final class ControlPanelView: NSView {
         }
         delegate?.controlPanel(self, didToggleFrameGeneration: frameGenerationSwitch.state == .on)
     }
-
-
 
     @objc
     private func handleAdvancedToggle() {

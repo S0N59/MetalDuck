@@ -16,7 +16,12 @@ final class MainViewController: NSViewController {
     private let profileManager = ProfileManager.shared
     private let overlayController: ScalingOverlayController
 
-    private var captureConfiguration = CaptureConfiguration(framesPerSecond: 30, queueDepth: 5)
+    private var currentProcessObservation: NSKeyValueObservation?
+
+    private var autoRecoveryAttemptCount = 0
+    private var lastAutoRecoveryTime: CFTimeInterval = 0
+
+    private var captureConfiguration = CaptureConfiguration(framesPerSecond: 60, queueDepth: 5)
 
     private var selectedCaptureMode: CaptureModeChoice = .automatic
     private var selectedDisplayIndex: Int = 0
@@ -129,6 +134,47 @@ final class MainViewController: NSViewController {
                 self?.handleRendererStats(stats)
             }
         }
+        
+        renderer.onGeometryUpdate = { [weak self] rect in
+            self?.overlayController.updateFrame(to: rect)
+        }
+        
+        renderer.onError = { [weak self] error in
+            DispatchQueue.main.async {
+                self?.handleRendererError(error)
+            }
+        }
+    }
+
+    private func handleRendererError(_ error: Error) {
+        if (error as? CaptureStaleError) == .framesStalled {
+            let now = CACurrentMediaTime()
+            if now - lastAutoRecoveryTime > 10.0 {
+                autoRecoveryAttemptCount = 0
+            }
+            
+            if autoRecoveryAttemptCount < 3 {
+                autoRecoveryAttemptCount += 1
+                lastAutoRecoveryTime = now
+                controlPanel.setStatus("Tracking new window (Fullscreen?)...", isError: false)
+                
+                Task {
+                    await renderer.stop()
+                    try? await Task.sleep(nanoseconds: 250_000_000)
+                    let target = self.selectedCaptureTarget()
+                    let config = self.captureConfiguration
+                    try? await self.renderer.reconfigureCapture(target: target)
+                    try? await self.renderer.reconfigureCapture(configuration: config)
+                    try? await self.renderer.start()
+                }
+            } else {
+                controlPanel.setStatus("Capture stalled. Please refresh sources or capture Display.", isError: true)
+                overlayController.setCaptureError("Window lost. Check if window is visible.")
+            }
+        } else {
+            controlPanel.setStatus("Error: \(error.localizedDescription)", isError: true)
+            overlayController.setCaptureError(error.localizedDescription)
+        }
     }
 
     private func handleRendererStats(_ stats: RendererStats) {
@@ -149,6 +195,9 @@ final class MainViewController: NSViewController {
         overlayController.updateStats(stats)
         if stats.isRunning {
             controlPanel.setStatus("Running")
+            if stats.captureFPS > 5.0 {
+                autoRecoveryAttemptCount = 0
+            }
         }
     }
 
@@ -678,6 +727,7 @@ extension MainViewController: ControlPanelViewDelegate {
         updateWindowTitle()
         panel.setStatus("FG Mode: \(mode.rawValue)")
     }
+
 
     func controlPanel(_ panel: ControlPanelView, didSelectProfile id: UUID) {
         profileManager.selectProfile(id: id)

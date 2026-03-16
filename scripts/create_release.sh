@@ -33,7 +33,7 @@ APP_DIR="$STAGE_DIR/$APP_BUNDLE_NAME"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
-DMG_PATH="$ROOT_DIR/dist/MetalDuck-v1.1.0.dmg"
+DMG_PATH="$ROOT_DIR/dist/MetalDuck-v1.2.0.dmg"
 
 rm -rf "$STAGE_DIR" "$DMG_STAGE_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR" "$DMG_STAGE_DIR"
@@ -59,9 +59,9 @@ cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
   <key>CFBundleIdentifier</key>
   <string>com.nycolazs.metaldduck</string>
   <key>CFBundleVersion</key>
-  <string>1.1.0</string>
+  <string>1.2.0</string>
   <key>CFBundleShortVersionString</key>
-  <string>1.1.0</string>
+  <string>1.2.0</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleExecutable</key>
@@ -97,32 +97,39 @@ fi
 TEMP_DMG="${DMG_PATH}.temp.dmg"
 rm -f "$TEMP_DMG" "$DMG_PATH"
 
-hdiutil create -srcfolder "$DMG_STAGE_DIR" -volname "MetalDuck" -format UDRW -ov "$TEMP_DMG"
+# Use HFS+ instead of APFS so it mounts exactly as "MetalDuck" volumename predictably without a container
+hdiutil create -srcfolder "$DMG_STAGE_DIR" -volname "MetalDuck" -fs HFS+ -format UDRW -ov "$TEMP_DMG"
 
 # Mount the temporary DMG
 echo "Mounting temporary DMG to configure layout..."
 MOUNT_DIR=$(mktemp -d /tmp/metaldduck_mount.XXXXXX)
 hdiutil attach "$TEMP_DMG" -mountpoint "$MOUNT_DIR" -noautoopen
 
+# The volume name is explicity set to "MetalDuck"
+VOLUME_NAME="MetalDuck"
+
 # Use AppleScript to configure the DMG window
 echo "Configuring DMG layout via AppleScript..."
-VOLUME_NAME=$(basename "$MOUNT_DIR")
 osascript <<APPLESCRIPT
 tell application "Finder"
-    tell disk "$VOLUME_NAME"
+    set theWindow to make new Finder window to (POSIX file "$MOUNT_DIR") as alias
+    tell theWindow
         open
-        set current view of container window to icon view
-        set toolbar visible of container window to false
-        set statusbar visible of container window to false
-        set the bounds of container window to {400, 100, 1000, 500}
-        set viewOptions to the icon view options of container window
-        set icon size of viewOptions to 100
-        set arrangement of viewOptions to not arranged
-        set background picture of viewOptions to file ".background:background.png"
-        set position of item "MetalDuck.app" of container window to {170, 200}
-        set position of item "Applications" of container window to {430, 200}
-        close
+        set current view to icon view
+        set toolbar visible to false
+        set statusbar visible to false
+        set the bounds to {400, 100, 1000, 500}
     end tell
+    
+    set viewOptions to the icon view options of theWindow
+    set icon size of viewOptions to 100
+    set arrangement of viewOptions to not arranged
+    set background picture of viewOptions to file ".background:background.png" of (POSIX file "$MOUNT_DIR" as alias)
+    
+    set position of item "MetalDuck.app" of theWindow to {170, 200}
+    set position of item "Applications" of theWindow to {430, 200}
+    
+    close theWindow
 end tell
 APPLESCRIPT
 

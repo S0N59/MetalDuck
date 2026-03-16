@@ -29,34 +29,60 @@ final class ProfileManager {
     }
     
     private init() {
-        // Built-in profiles
-        let performance = Profile(
-            name: "Performance",
+        // Built-in profiles optimized for specific use cases
+        
+        // 🎮 Games: High capture rate, temporal upscaling, dynamic resolution
+        // Optimized for real-time game content with fast motion
+        let games = Profile(
+            name: "🎮 Games",
             settings: RenderSettings(
-                upscalingAlgorithm: .nativeLinear,
+                upscalingAlgorithm: .metalFXTemporal,
                 outputScale: 1.0,
                 matchOutputResolution: true,
-                samplingMode: .nearest,
-                sharpness: 0.0,
+                samplingMode: .linear,
+                sharpness: 0.10,
                 dynamicResolutionEnabled: true,
-                dynamicScaleMinimum: 0.70,
+                dynamicScaleMinimum: 0.75,
                 dynamicScaleMaximum: 1.0,
-                targetPresentationFPS: 60,
-                frameGenerationEnabled: false,
+                targetPresentationFPS: 120,
+                frameGenerationEnabled: true,
                 frameGenerationMode: .x2
             ),
-            capture: CaptureConfiguration(framesPerSecond: 30, queueDepth: 4),
+            capture: CaptureConfiguration(framesPerSecond: 60, queueDepth: 4),
             isBuiltIn: true
         )
         
-        let balanced = Profile(
-            name: "Balanced",
+        // 🎬 Anime: Low capture rate to match 24fps source, aggressive frame gen
+        // High sharpness to preserve crisp line art and flat color regions
+        let anime = Profile(
+            name: "🎬 Anime",
+            settings: RenderSettings(
+                upscalingAlgorithm: .metalFXSpatial,
+                outputScale: 1.25,
+                matchOutputResolution: true,
+                samplingMode: .linear,
+                sharpness: 0.30,
+                dynamicResolutionEnabled: false,
+                dynamicScaleMinimum: 1.0,
+                dynamicScaleMaximum: 1.0,
+                targetPresentationFPS: 120,
+                frameGenerationEnabled: true,
+                frameGenerationMode: .x4
+            ),
+            capture: CaptureConfiguration(framesPerSecond: 30, queueDepth: 6),
+            isBuiltIn: true
+        )
+        
+        // 🎥 Video: Standard capture for YouTube/Films (typically 30fps)
+        // Moderate sharpness for natural film look, 2x frame gen for smooth playback
+        let video = Profile(
+            name: "🎥 Video",
             settings: RenderSettings(
                 upscalingAlgorithm: .metalFXSpatial,
                 outputScale: 1.15,
                 matchOutputResolution: true,
                 samplingMode: .linear,
-                sharpness: 0.12,
+                sharpness: 0.15,
                 dynamicResolutionEnabled: false,
                 dynamicScaleMinimum: 1.0,
                 dynamicScaleMaximum: 1.0,
@@ -68,31 +94,12 @@ final class ProfileManager {
             isBuiltIn: true
         )
         
-        let quality = Profile(
-            name: "Quality",
-            settings: RenderSettings(
-                upscalingAlgorithm: .metalFXSpatial,
-                outputScale: 1.35,
-                matchOutputResolution: false,
-                samplingMode: .linear,
-                sharpness: 0.22,
-                dynamicResolutionEnabled: false,
-                dynamicScaleMinimum: 1.0,
-                dynamicScaleMaximum: 1.0,
-                targetPresentationFPS: 60,
-                frameGenerationEnabled: true,
-                frameGenerationMode: .x2
-            ),
-            capture: CaptureConfiguration(framesPerSecond: 30, queueDepth: 6),
-            isBuiltIn: true
-        )
-        
         // Load saved profiles or use defaults
         if let data = UserDefaults.standard.data(forKey: storageKey),
            let saved = try? JSONDecoder().decode([Profile].self, from: data) {
-            self.profiles = [performance, balanced, quality] + saved.filter { !$0.isBuiltIn }
+            self.profiles = [games, anime, video] + saved.filter { !$0.isBuiltIn }
         } else {
-            self.profiles = [performance, balanced, quality]
+            self.profiles = [games, anime, video]
         }
         
         // Restore active profile
@@ -101,7 +108,7 @@ final class ProfileManager {
            profiles.contains(where: { $0.id == id }) {
             self.activeProfileId = id
         } else {
-            self.activeProfileId = balanced.id
+            self.activeProfileId = video.id
         }
     }
     
@@ -147,7 +154,7 @@ final class ProfileManager {
         
         profiles.remove(at: index)
         if activeProfileId == id {
-            activeProfileId = profiles[1].id // Default to Balanced
+            activeProfileId = profiles[1].id // Default to Anime
             UserDefaults.standard.set(activeProfileId.uuidString, forKey: activeProfileIdKey)
         }
         saveCustomProfiles()

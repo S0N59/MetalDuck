@@ -66,6 +66,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             Task { await viewController.start() }
             requestScreenCapturePermissionIfNeededAsync()
+            requestAccessibilityPermissionIfNeededAsync()
         } catch {
             print("CRITICAL: Bootstrap failed: \(error)")
             presentFatalInitializationError(error)
@@ -111,5 +112,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         _ = CGRequestScreenCaptureAccess()
+    }
+
+    private func requestAccessibilityPermissionIfNeededAsync() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
+            _ = AXIsProcessTrustedWithOptions(options)
+        }
     }
 }

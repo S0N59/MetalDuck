@@ -14,7 +14,7 @@ struct CaptureConfiguration: Codable, Equatable {
     var preferredPixelSize: CGSize?
 
     init(
-        framesPerSecond: Int = 30,
+        framesPerSecond: Int = 60,
         queueDepth: Int = 5,
         showsCursor: Bool = false,
         preferredPixelSize: CGSize? = nil

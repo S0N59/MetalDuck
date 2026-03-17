@@ -131,8 +131,8 @@ tell application "Finder"
         set background picture to file ".background:background.png" of (POSIX file "$MOUNT_DIR" as alias)
     end tell
     
-    set position of item "MetalDuck.app" of theWindow to {160, 180}
-    set position of item "Applications" of theWindow to {420, 180}
+    set position of item "MetalDuck.app" of theWindow to {160, 200}
+    set position of item "Applications" of theWindow to {420, 200}
     
     close theWindow
 end tell

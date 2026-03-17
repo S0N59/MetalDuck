@@ -18,6 +18,7 @@
 🚀 MetalDuck Enhanced (Apple Silicon)
 
 Improved version of MetalDuck with better UI, profiles, and performance optimizations for macOS gaming.
+
 MetalDuck is a professional-grade performance harness designed to bring high-fidelity upscaling and smooth frame generation to the macOS gaming and media ecosystem. By leveraging Apple Silicon's latest MetalFX capabilities and advanced optical-flow algorithms, MetalDuck enables "lossless scaling" and fluid motion on any window or display.
 
 ## 🚀 Improvements Over Original

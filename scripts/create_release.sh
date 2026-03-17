@@ -99,21 +99,26 @@ fi
 
 # Create a temporary empty DMG to configure layout
 TEMP_DMG="${DMG_PATH}.temp.dmg"
+MOUNT_DIR=$(mktemp -d /tmp/metaldduck_mount.XXXXXX)
+
+# Robust cleanup on exit
+cleanup() {
+  echo "Cleaning up..."
+  hdiutil detach "$MOUNT_DIR" 2>/dev/null || true
+  rm -f "$TEMP_DMG"
+  rmdir "$MOUNT_DIR" 2>/dev/null || true
+}
+trap cleanup EXIT
+
 rm -f "$TEMP_DMG" "$DMG_PATH"
 
-# Use HFS+ instead of APFS so it mounts exactly as "MetalDuck" volumename predictably without a container
+echo "Creating temporary DMG..."
 hdiutil create -srcfolder "$DMG_STAGE_DIR" -volname "MetalDuck" -fs HFS+ -format UDRW -ov "$TEMP_DMG"
 
-# Mount the temporary DMG
-echo "Mounting temporary DMG to configure layout..."
-MOUNT_DIR=$(mktemp -d /tmp/metaldduck_mount.XXXXXX)
+echo "Mounting temporary DMG..."
 hdiutil attach "$TEMP_DMG" -mountpoint "$MOUNT_DIR" -noautoopen
 
-# The volume name is explicity set to "MetalDuck"
-VOLUME_NAME="MetalDuck"
-
-# Use AppleScript to configure the DMG window
-echo "Configuring DMG layout via AppleScript..."
+echo "Configuring DMG layout..."
 osascript <<APPLESCRIPT
 tell application "Finder"
     set theWindow to make new Finder window to (POSIX file "$MOUNT_DIR") as alias
@@ -134,20 +139,21 @@ tell application "Finder"
     set position of item "MetalDuck.app" of theWindow to {160, 200}
     set position of item "Applications" of theWindow to {420, 200}
     
+    update item "MetalDuck.app" of theWindow
+    update item "Applications" of theWindow
+    
+    delay 2
     close theWindow
 end tell
 APPLESCRIPT
 
-# Give Finder a moment to write its .DS_Store
-sleep 2
-
-# Set the DMG root to be invisible (optional, but cleaner)
-# Set custom icon for the volume if needed
-
-# Detach and convert to compressed DMG
+echo "Detaching DMG..."
 hdiutil detach "$MOUNT_DIR"
+
+echo "Converting to final DMG..."
 hdiutil convert "$TEMP_DMG" -format UDZO -o "$DMG_PATH"
-rm -f "$TEMP_DMG"
-rmdir "$MOUNT_DIR"
+
+echo "Finalizing output..."
+rm -rf "$STAGE_DIR" "$DMG_STAGE_DIR"
 
 echo "Release package created: $DMG_PATH"

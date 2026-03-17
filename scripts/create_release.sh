@@ -91,11 +91,8 @@ codesign --verify --deep --strict --verbose=2 "$APP_DIR"
 cp -R "$APP_DIR" "$DMG_STAGE_DIR/"
 ln -s /Applications "$DMG_STAGE_DIR/Applications"
 
-# Set up the DMG background
-mkdir -p "$DMG_STAGE_DIR/.background"
-if [[ -f "$ROOT_DIR/Sources/MetalDuck/Assets/dmg_background.png" ]]; then
-  cp "$ROOT_DIR/Sources/MetalDuck/Assets/dmg_background.png" "$DMG_STAGE_DIR/.background/background.png"
-fi
+# Set up the DMG background (SKIPPED - Background removed)
+# mkdir -p "$DMG_STAGE_DIR/.background"
 
 # Create a temporary empty DMG to configure layout
 TEMP_DMG="${DMG_PATH}.temp.dmg"
@@ -127,17 +124,17 @@ tell application "Finder"
         set current view to icon view
         set toolbar visible to false
         set statusbar visible to false
-        set the bounds to {400, 100, 1000, 500}
+        set the bounds to {400, 100, 900, 400} -- 500x300 window
     end tell
     
     tell the icon view options of theWindow
         set icon size to 128
         set arrangement to not arranged
-        set background picture to file ".background:background.png" of (POSIX file "$MOUNT_DIR" as alias)
+        -- background picture removed
     end tell
     
-    set position of item "MetalDuck.app" of theWindow to {160, 200}
-    set position of item "Applications" of theWindow to {420, 200}
+    set position of item "MetalDuck.app" of theWindow to {160, 150}
+    set position of item "Applications" of theWindow to {340, 150}
     
     update item "MetalDuck.app" of theWindow
     update item "Applications" of theWindow

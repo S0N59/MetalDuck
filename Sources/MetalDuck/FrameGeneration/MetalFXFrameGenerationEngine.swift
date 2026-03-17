@@ -43,6 +43,8 @@ private struct FlowOcclusionParams {
 
 // MARK: - Frame Generation Engine
 
+/// Core engine for generating interpolated frames using motion-compensated warping.
+/// Orchestrates occlusion detection, flow warping, and frame composition shaders.
 final class MetalFXFrameGenerationEngine {
     private let device: MTLDevice
 

@@ -8,6 +8,8 @@ import MetalPerformanceShaders
 /// Async optical flow provider using Apple's Vision framework.
 /// Runs VNGenerateOpticalFlowRequest on the ANE/GPU via a dedicated queue.
 /// The frame pipeline submits frame pairs and queries the latest available result.
+/// Async optical flow provider leveraging Apple's Vision framework (VNGenerateOpticalFlowRequest).
+/// Computes motion vectors on the ANE or GPU to enable accurate frame interpolation.
 final class VisionFlowProvider: @unchecked Sendable {
     private let device: MTLDevice
     private let commandQueue: MTLCommandQueue

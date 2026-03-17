@@ -1,6 +1,8 @@
 import Foundation
 
 @MainActor
+/// Manages the persistence and state of user-defined and built-in render profiles.
+/// Handles creation, deletion, and selection of profiles across application sessions.
 final class ProfileManager {
     static let shared = ProfileManager()
     

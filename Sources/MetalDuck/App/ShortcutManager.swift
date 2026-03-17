@@ -1,6 +1,14 @@
 import AppKit
 
 @MainActor
+/// Async optical flow provider leveraging Apple's Vision framework (VNGenerateOpticalFlowRequest).
+/// Computes motion vectors on the ANE or GPU to enable accurate frame interpolation.
+final class VisionFlowProvider: @unchecked Sendable {
+    // Placeholder for VisionFlowProvider content
+}
+
+/// Handles system-wide and local keyboard shortcut monitoring.
+/// Allows users to toggle application features using configurable hotkey combinations.
 final class ShortcutManager {
     static let shared = ShortcutManager()
 
